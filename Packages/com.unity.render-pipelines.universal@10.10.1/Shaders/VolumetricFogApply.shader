@@ -11,36 +11,32 @@
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
 			#pragma multi_compile_local _ _IgnoreSkybox
-			#pragma vertex vert
+			#pragma vertex ProceduralVert
 			#pragma fragment frag
 			
 			TEXTURE2D(_CameraDepthTexture);
             SAMPLER(sampler_CameraDepthTexture);
+
+			struct ProceduralAttributes
+			{
+			    uint vertexID : VERTEXID_SEMANTIC;
+			};
+
+			struct ProceduralVaryings
+			{
+			    float4 positionCS : SV_POSITION;
+			    float2 uv : TEXCOORD;
+			};
+
+			ProceduralVaryings ProceduralVert (ProceduralAttributes input)
+			{
+			    ProceduralVaryings output;
+			    output.positionCS = GetFullScreenTriangleVertexPosition(input.vertexID);
+			    output.uv = GetFullScreenTriangleTexCoord(input.vertexID);
+			    return output;
+			}
 			
-			struct Attributes
-            {
-                float4 positionOS       : POSITION;
-                float2 uv               : TEXCOORD0;
-            };
-
-            struct Varyings
-            {
-                float2 uv        : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
-
-			Varyings vert(Attributes input)
-            {
-                Varyings output = (Varyings)0;
-
-                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
-                output.vertex = vertexInput.positionCS;
-                output.uv = input.uv;
-
-                return output;
-            }
-			
-			float4 frag(Varyings input) : SV_Target
+			float4 frag(ProceduralVaryings input) : SV_Target
             {
             	float z = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, input.uv);
             	#if _IgnoreSkybox

@@ -125,33 +125,28 @@ float4 SampleVolumetricFog(float2 uv, float z)
 {
     float4 AccumulatedLighting = float4(0, 0, 0, 1);
     float EyeSpaceZ = LinearEyeDepth(z, _ZBufferParams);
-    bool UseOutside = false;
     if(VFog_Extinction > 0)
     {
         float3 uvw = float3(uv, EyeDepthToVolumeW(EyeSpaceZ));
         AccumulatedLighting = _ScatteringLightResult.Sample(sampler_TrilinearClamp, uvw);
-        if(uvw.z > 1 && VFog_OutsideIntensity > 0)
-        {
-            UseOutside = true;
-        }
     }
-    else if(VFog_OutsideIntensity > 0)
-    {
-        UseOutside = true;
-    }
-    if(UseOutside)
+    if(VFog_OutsideIntensity > 0)
     {
         float3 WorldPos = NDCToWorldPostion(float3(uv * 2 - 1, z));
         float3 VectorToTarget = WorldPos.xyz - _WorldSpaceCameraPos;
         float Distance = sqrt(dot(VectorToTarget, VectorToTarget));
-        float3 Dir = VectorToTarget / Distance;
-        float3 V = -Dir;
-        
-        float Transmittance = CalFog(Dir, Distance);
-        float3 L = -_MainLightPosition.xyz;
-        float3 LightScattering = VFog_AmbientLight + _MainLightColor.xyz * lerp(VFog_ForwardScatteringColor, VFog_BackwardScatteringColor, dot(V, L) * 0.5 + 0.5) * INV_TWO_PI;
-        AccumulatedLighting.rgb += LightScattering * (1 - Transmittance) * AccumulatedLighting.w;
-        AccumulatedLighting.w *= Transmittance;
+
+        if(Distance > VFog_GridZParams.w)
+        {
+            float3 Dir = VectorToTarget / Distance;
+            float3 V = -Dir;
+            
+            float Transmittance = CalFog(Dir, Distance);
+            float3 L = -_MainLightPosition.xyz;
+            float3 LightScattering = VFog_AmbientLight + _MainLightColor.xyz * lerp(VFog_ForwardScatteringColor, VFog_BackwardScatteringColor, dot(V, L) * 0.5 + 0.5) * INV_TWO_PI;
+            AccumulatedLighting.rgb += LightScattering * (1 - Transmittance) * AccumulatedLighting.w;
+            AccumulatedLighting.w *= Transmittance;
+        }
     }
     return AccumulatedLighting;
 }

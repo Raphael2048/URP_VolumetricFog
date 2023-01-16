@@ -325,7 +325,8 @@ public class VolumetricFogRenderFeature : ScriptableRendererFeature
                 m_RenderFeature.m_BlitMatrial.DisableKeyword("_IgnoreSkybox");
             }
             
-            cmd.Blit(null, renderingData.cameraData.renderer.cameraColorTarget, m_RenderFeature.m_BlitMatrial, 0);
+            cmd.SetRenderTarget(renderingData.cameraData.renderer.cameraColorTarget);
+            cmd.DrawProcedural(Matrix4x4.identity, m_RenderFeature.m_BlitMatrial, 0, MeshTopology.Triangles, 3);
             CoreUtils.SetKeyword(cmd, ShaderKeywordStrings.VolumetricFog, true);
            
             context.ExecuteCommandBuffer(cmd);

@@ -18,13 +18,13 @@ namespace UnityEngine.Rendering.Universal
         public ColorParameter AmbientLight = new ColorParameter(new Color(0.5f, 0.5f, 0.5f));
         
         //外部线性雾
-        public ClampedFloatParameter OutsideIntensity = new ClampedFloatParameter(0, 0, 30);
-        public ClampedFloatParameter HeightFallOff = new ClampedFloatParameter(0, 0, 3);
+        public ClampedFloatParameter OutsideIntensity = new ClampedFloatParameter(0, 0, 10);
+        public ClampedFloatParameter HeightFallOff = new ClampedFloatParameter(0, 0, 0.5f);
         public ClampedFloatParameter MaxFogDistance = new ClampedFloatParameter(300, 50, 1000);
         public ClampedFloatParameter HorizonHeight = new ClampedFloatParameter(0, -10, 10);
         
         //内部体积雾
-        public ClampedFloatParameter InnerIntensity = new ClampedFloatParameter(0, 0, 30);
+        public ClampedFloatParameter InnerIntensity = new ClampedFloatParameter(0, 0, 10);
         public ClampedFloatParameter Distance = new ClampedFloatParameter(60f, 1, 300);
         public BoolParameter IgnoreSkybox = new BoolParameter(false);
         public Texture3DParameter Noise = new Texture3DParameter(null);
